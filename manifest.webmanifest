@@ -1,0 +1,18 @@
+{
+  "name": "期货期权风控 Pro",
+  "short_name": "风控Pro",
+  "start_url": "./futures-options-risk-pro.html",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#171614",
+  "theme_color": "#171614",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23171614'/%3E%3Cpath d='M12 42 26 28l9 9 17-23' fill='none' stroke='%234f98a3' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12 52h40' fill='none' stroke='%23ece9e3' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

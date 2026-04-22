@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>期货期权组合风控 Pro</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <meta name="description" content="安卓端期货与期权组合策略资金管理、Black-Scholes 定价、Greeks 管理、收益风险测算工具" />
+  <meta name="theme-color" content="#171614" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.05rem);
+      --text-lg: clamp(1.06rem, 0.95rem + 0.65vw, 1.35rem);
+      --text-xl: clamp(1.35rem, 1.05rem + 1.4vw, 2rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem;
+      --color-bg:#f7f6f2; --color-surface:#f9f8f5; --color-surface-2:#fbfbf9; --color-surface-offset:#f3f0ec;
+      --color-border:#d4d1ca; --color-divider:#dcd9d5; --color-text:#28251d; --color-text-muted:#6b6963; --color-text-faint:#9f9c95;
+      --color-primary:#01696f; --color-success:#437a22; --color-warning:#964219; --color-error:#a12c7b;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --radius-sm:.5rem; --radius-md:.8rem; --radius-lg:1rem; --radius-xl:1.3rem; --radius-full:9999px;
+      --font-body:'Satoshi','Inter',sans-serif;
+    }
+    [data-theme="dark"] {
+      --color-bg:#171614; --color-surface:#1c1b19; --color-surface-2:#201f1d; --color-surface-offset:#242321;
+      --color-border:#393836; --color-divider:#262523; --color-text:#ece9e3; --color-text-muted:#aca79f; --color-text-faint:#77716a;
+      --color-primary:#4f98a3; --color-success:#7bc55e; --color-warning:#f0a45d; --color-error:#e77db6;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.22); --shadow-md:0 4px 12px rgba(0,0,0,.34);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{height:100%;overflow:hidden;background:var(--color-bg)}
+    body{height:100%;min-height:100dvh;overflow:hidden;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:var(--text-base);line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    img,svg,canvas{display:block;max-width:100%} button,input,select{font:inherit;color:inherit} button{border:none;cursor:pointer;background:none}
+    input,select{width:100%;max-width:100%;min-width:0;padding:.88rem .95rem;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-md);background:var(--color-surface-offset)}
+    input:focus,select:focus{outline:2px solid var(--color-primary);outline-offset:2px}
+    .app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh;max-width:100vw;overflow:hidden}
+    .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:calc(env(safe-area-inset-top) + .75rem) .95rem .85rem;border-bottom:1px solid var(--color-divider);background:rgba(23,22,20,.94);backdrop-filter:blur(14px)}
+    .brand{display:flex;align-items:center;gap:.75rem;min-width:0}.logo{width:2.2rem;height:2.2rem;border-radius:.7rem;display:grid;place-items:center;background:linear-gradient(135deg,rgba(79,152,163,.25),transparent);border:1px solid rgba(255,255,255,.08)}
+    .brand-copy{min-width:0}.brand h1{font-size:1rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand p{font-size:var(--text-xs);color:var(--color-text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .top-actions{display:flex;gap:.5rem;align-items:center}.theme-btn{width:2.55rem;height:2.55rem;border-radius:50%;background:var(--color-surface);border:1px solid var(--color-border);display:grid;place-items:center;flex:0 0 auto}
+    .main{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:.9rem .9rem calc(5.8rem + env(safe-area-inset-bottom));max-width:100%;min-width:0}
+    .hero{display:grid;gap:.9rem;padding-bottom:.6rem}.hero-card{min-height:calc(100dvh - 15rem);display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(160deg,rgba(79,152,163,.18),transparent 58%),var(--color-surface);padding:1.05rem;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-xl);box-shadow:var(--shadow-md)}
+    .hero-card h2{font-size:clamp(1.8rem, 1.35rem + 2vw, 2.4rem);line-height:1.05;margin-bottom:.65rem;max-width:11ch}.hero-card p{color:var(--color-text-muted);max-width:30ch}
+    .chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem}.chip{padding:.42rem .68rem;border-radius:var(--radius-full);font-size:var(--text-xs);background:rgba(79,152,163,.12);color:var(--color-primary);border:1px solid rgba(79,152,163,.18)}
+    .inline-kpis,.metrics,.strategy-grid{display:grid;gap:.72rem}.inline-kpis{grid-template-columns:repeat(3,1fr)}.metrics{grid-template-columns:repeat(2,1fr)}.strategy-grid{grid-template-columns:repeat(2,1fr)}
+    .metric,.pill,.card{min-width:0}.metric{padding:.88rem;border-radius:var(--radius-md);background:var(--color-surface-offset);border:1px solid rgba(255,255,255,.06)}.metric .k{font-size:var(--text-xs);color:var(--color-text-muted)}.metric .v{font-size:1rem;font-weight:700;font-variant-numeric:tabular-nums lining-nums;margin-top:.22rem}
+    .section{display:none;gap:.95rem;min-width:0}.section.active{display:grid}.card{background:var(--color-surface);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-lg);padding:1rem;box-shadow:var(--shadow-sm);overflow:hidden}.card h3{font-size:var(--text-lg);margin-bottom:.28rem}.card .sub{font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:.9rem}
+    .form-grid,.stack{display:grid;gap:.8rem;min-width:0}.two,.three{display:grid;gap:.72rem;min-width:0}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.label{display:grid;gap:.34rem;font-size:var(--text-sm);min-width:0}
+    .btn-row{display:flex;gap:.72rem;flex-wrap:wrap;margin-top:.2rem}.btn{padding:.9rem 1rem;border-radius:var(--radius-md);font-weight:700;min-height:44px}.btn-primary{background:var(--color-primary);color:white}.btn-secondary{background:var(--color-surface-offset);border:1px solid var(--color-border)}
+    .pill{padding:.85rem;border-radius:var(--radius-md);text-align:left;background:var(--color-surface-offset);border:1px solid rgba(255,255,255,.06);font-size:var(--text-sm)}.pill strong{display:block;margin-bottom:.18rem}
+    .table-wrap{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;border-radius:var(--radius-md);border:1px solid rgba(255,255,255,.06);-webkit-overflow-scrolling:touch} table{width:100%;min-width:720px;border-collapse:collapse;font-size:var(--text-sm)} th,td{padding:.72rem .68rem;text-align:left;border-bottom:1px solid var(--color-divider);font-variant-numeric:tabular-nums lining-nums} th{background:var(--color-surface-offset);color:var(--color-text-muted);position:sticky;top:0}
+    .note{padding:.8rem .92rem;border-radius:var(--radius-md);background:rgba(79,152,163,.08);color:var(--color-text-muted);font-size:var(--text-sm)}
+    .chart-shell{position:relative;width:100%;height:240px;max-width:100%;overflow:hidden} canvas{width:100%!important;height:100%!important}
+    .bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:.42rem;padding:.62rem .72rem calc(.62rem + env(safe-area-inset-bottom));border-top:1px solid var(--color-divider);background:rgba(28,27,25,.96);backdrop-filter:blur(12px)}
+    .tab{display:grid;place-items:center;gap:.18rem;padding:.56rem .18rem;border-radius:.88rem;color:var(--color-text-muted);font-size:11px;min-height:52px;text-align:center}.tab.active{background:var(--color-surface-offset);color:var(--color-primary)}
+    .status,.legend{font-size:var(--text-xs);color:var(--color-text-muted)} .legend{display:flex;gap:.72rem;flex-wrap:wrap;margin-top:.55rem}.dot{width:.68rem;height:.68rem;border-radius:50%;display:inline-block;margin-right:.34rem}
+    @media (max-width: 640px){
+      .two,.three,.metrics,.strategy-grid{grid-template-columns:1fr}
+      .inline-kpis{grid-template-columns:repeat(3,1fr)}
+      .hero-card{min-height:calc(100dvh - 14.2rem)}
+      .hero-card h2{max-width:12ch}
+    }
+    @media (min-width: 700px){
+      .main{max-width:920px;width:100%;margin:0 auto}
+      .hero-card{min-height:auto}
+      .metrics{grid-template-columns:repeat(4,1fr)}
+      .strategy-grid{grid-template-columns:repeat(3,1fr)}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand">
+    <div class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16 10 10l4 4 6-8"/><path d="M4 20h16"/></svg></div>
+    <div class="brand-copy"><h1>期货期权风控 Pro</h1><p>BS 定价 · 模板策略 · 可安装 PWA</p></div>
+  </div>
+  <div class="top-actions"><button class="theme-btn" data-theme-toggle aria-label="切换主题">☼</button></div>
+</header>
+<main class="main" id="mainContent">
+  <section class="hero">
+    <div class="hero-card">
+      <div>
+        <h2>把定价、Greeks、保证金与收益曲线放进同一个移动端工作台</h2>
+        <p>支持 Black-Scholes 欧式期权定价、自动 Greeks、期货/期权模板、情景压力测试与安卓端安装体验。</p>
+        <div class="chips"><span class="chip">Black-Scholes</span><span class="chip">策略模板</span><span class="chip">离线支持</span><span class="chip">Android PWA</span></div>
+      </div>
+    </div>
+    <div class="inline-kpis">
+      <div class="metric"><div class="k">模板</div><div class="v">6</div></div>
+      <div class="metric"><div class="k">保证金</div><div class="v" id="marginUsed">0</div></div>
+      <div class="metric"><div class="k">风险等级</div><div class="v" id="riskLevel">--</div></div>
+    </div>
+  </section>
+
+  <section class="section active" data-section="capital">
+    <div class="card">
+      <h3>资金管理</h3>
+      <p class="sub">按账户权益、风控预算、点值、止损与保证金率，计算建议仓位与资金利用率。</p>
+      <div class="form-grid">
+        <label class="label">账户净值<input id="equity" type="number" value="500000"></label>
+        <div class="two">
+          <label class="label">单笔风险占比 %<input id="riskPct" type="number" step="0.1" value="1.5"></label>
+          <label class="label">组合回撤上限 %<input id="maxDrawdown" type="number" step="0.1" value="8"></label>
+        </div>
+        <div class="two">
+          <label class="label">每点价值<input id="pointValue" type="number" value="300"></label>
+          <label class="label">止损距离（点）<input id="stopPts" type="number" value="20"></label>
+        </div>
+        <div class="two">
+          <label class="label">保证金率 %<input id="marginRate" type="number" step="0.1" value="12"></label>
+          <label class="label">标的现价<input id="spotCapital" type="number" value="3250"></label>
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" id="calcCapital">更新资金测算</button></div>
+      </div>
+      <div class="metrics" style="margin-top:1rem">
+        <div class="metric"><div class="k">单笔风险预算</div><div class="v" id="riskBudget">0</div></div>
+        <div class="metric"><div class="k">建议期货手数</div><div class="v" id="contractQty">0</div></div>
+        <div class="metric"><div class="k">估算保证金</div><div class="v" id="marginEstimate">0</div></div>
+        <div class="metric"><div class="k">资金利用率</div><div class="v" id="capitalUsage">0%</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-section="pricing">
+    <div class="card">
+      <h3>Black-Scholes 自动定价</h3>
+      <p class="sub">按欧式期权参数自动计算理论价与 Greeks，用于快速构建组合。</p>
+      <div class="form-grid">
+        <div class="two">
+          <label class="label">期权类型<select id="bsType"><option value="call">Call</option><option value="put">Put</option></select></label>
+          <label class="label">方向<select id="bsSide"><option value="1">多头</option><option value="-1">空头</option></select></label>
+        </div>
+        <div class="two">
+          <label class="label">标的价格 S<input id="bsS" type="number" value="3250"></label>
+          <label class="label">执行价 K<input id="bsK" type="number" value="3300"></label>
+        </div>
+        <div class="three">
+          <label class="label">波动率 σ %<input id="bsVol" type="number" step="0.1" value="22"></label>
+          <label class="label">无风险利率 r %<input id="bsR" type="number" step="0.01" value="2.2"></label>
+          <label class="label">到期天数 T<input id="bsDays" type="number" value="30"></label>
+        </div>
+        <div class="two">
+          <label class="label">数量<input id="bsQty" type="number" value="1"></label>
+          <label class="label">合约乘数<input id="bsMult" type="number" value="300"></label>
+        </div>
+        <div class="btn-row"><button class="btn btn-primary" id="calcBS">自动计算并写入组合</button></div>
+      </div>
+      <div class="metrics" style="margin-top:1rem">
+        <div class="metric"><div class="k">理论价</div><div class="v" id="bsPrice">0</div></div>
+        <div class="metric"><div class="k">Delta</div><div class="v" id="bsDelta">0</div></div>
+        <div class="metric"><div class="k">Gamma</div><div class="v" id="bsGamma">0</div></div>
+        <div class="metric"><div class="k">Theta / 天</div><div class="v" id="bsTheta">0</div></div>
+        <div class="metric"><div class="k">Vega</div><div class="v" id="bsVega">0</div></div>
+        <div class="metric"><div class="k">名义权利金</div><div class="v" id="bsPremium">0</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-section="strategy">
+    <div class="card">
+      <h3>策略模板</h3>
+      <p class="sub">一键加载常见组合，再按你的参数微调。</p>
+      <div class="strategy-grid">
+        <button class="pill tmpl" data-template="coveredCall"><strong>备兑开仓</strong>多期货 + 空看涨</button>
+        <button class="pill tmpl" data-template="protectivePut"><strong>保护性看跌</strong>多期货 + 多看跌</button>
+        <button class="pill tmpl" data-template="bullCallSpread"><strong>牛市看涨价差</strong>买低执行价 call / 卖高执行价 call</button>
+        <button class="pill tmpl" data-template="bearPutSpread"><strong>熊市看跌价差</strong>买高执行价 put / 卖低执行价 put</button>
+        <button class="pill tmpl" data-template="longStraddle"><strong>长跨式</strong>同执行价买 call + buy put</button>
+        <button class="pill tmpl" data-template="shortStrangle"><strong>短宽跨</strong>卖虚值 call + 卖虚值 put</button>
+      </div>
+      <div class="note" style="margin-top:1rem">模板会同步更新到 Greeks 表与收益测算区，方便你继续改参数。</div>
+    </div>
+    <div class="card">
+      <h3>组合 Greeks</h3>
+      <p class="sub">支持手工录入，也支持从 Black-Scholes 计算结果自动写入最后一条期权腿。</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>腿</th><th>方向</th><th>数量</th><th>Delta</th><th>Gamma</th><th>Theta</th><th>Vega</th></tr></thead>
+          <tbody id="greekBody">
+            <tr><td>期货</td><td><select class="legDir"><option value="1" selected>多</option><option value="-1">空</option></select></td><td><input class="legQty" type="number" value="1"></td><td><input class="legDelta" type="number" step="0.01" value="1"></td><td><input class="legGamma" type="number" step="0.0001" value="0"></td><td><input class="legTheta" type="number" step="0.01" value="0"></td><td><input class="legVega" type="number" step="0.01" value="0"></td></tr>
+            <tr><td>Call</td><td><select class="legDir"><option value="1" selected>多</option><option value="-1">空</option></select></td><td><input class="legQty" type="number" value="1"></td><td><input class="legDelta" type="number" step="0.01" value="0.42"></td><td><input class="legGamma" type="number" step="0.0001" value="0.015"></td><td><input class="legTheta" type="number" step="0.01" value="-18"></td><td><input class="legVega" type="number" step="0.01" value="32"></td></tr>
+            <tr><td>Put</td><td><select class="legDir"><option value="1">多</option><option value="-1" selected>空</option></select></td><td><input class="legQty" type="number" value="1"></td><td><input class="legDelta" type="number" step="0.01" value="-0.28"></td><td><input class="legGamma" type="number" step="0.0001" value="0.009"></td><td><input class="legTheta" type="number" step="0.01" value="-11"></td><td><input class="legVega" type="number" step="0.01" value="24"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="btn-row"><button class="btn btn-primary" id="calcGreeks">汇总 Greeks</button></div>
+      <div class="metrics" style="margin-top:1rem">
+        <div class="metric"><div class="k">净 Delta</div><div class="v" id="netDelta">0</div></div>
+        <div class="metric"><div class="k">净 Gamma</div><div class="v" id="netGamma">0</div></div>
+        <div class="metric"><div class="k">净 Theta</div><div class="v" id="netTheta">0</div></div>
+        <div class="metric"><div class="k">净 Vega</div><div class="v" id="netVega">0</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" data-section="pnl">
+    <div class="card">
+      <h3>收益与风险测算</h3>
+      <p class="sub">对期货腿、1 条 Call 腿、1 条 Put 腿做快速到期收益分析，并同步输出压力测试。</p>
+      <div class="form-grid">
+        <div class="two"><label class="label">标的现价<input id="spot" type="number" value="3250"></label><label class="label">价格步长<input id="priceStep" type="number" value="20"></label></div>
+        <div class="two"><label class="label">期货手数（多正空负）<input id="futuresQty" type="number" value="1"></label><label class="label">期货建仓价<input id="futuresEntry" type="number" value="3240"></label></div>
+        <div class="two"><label class="label">Call: 执行价,权利金,数量<input id="callLine" type="text" value="3300, 55, 2"></label><label class="label">Put: 执行价,权利金,数量<input id="putLine" type="text" value="3180, 42, -1"></label></div>
+        <label class="label">合约乘数<input id="multiplier" type="number" value="300"></label>
+        <div class="btn-row"><button class="btn btn-primary" id="calcPnL">生成收益曲线</button></div>
+      </div>
+      <div class="metrics" style="margin-top:1rem">
+        <div class="metric"><div class="k">最大收益</div><div class="v" id="maxProfit">0</div></div>
+        <div class="metric"><div class="k">最大损失</div><div class="v" id="maxLoss">0</div></div>
+        <div class="metric"><div class="k">盈亏平衡点</div><div class="v" id="breakeven">--</div></div>
+        <div class="metric"><div class="k">5% 分位压力</div><div class="v" id="stressLoss">0</div></div>
+      </div>
+    </div>
+    <div class="card"><h3>收益曲线</h3><p class="sub">移动端自适应图表，方便快速查看组合风险非线性。</p><div class="chart-shell"><canvas id="payoffChart"></canvas></div></div>
+  </section>
+
+  <section class="section" data-section="risk">
+    <div class="card">
+      <h3>风险雷达</h3>
+      <p class="sub">把仓位、Greeks 与压力测试结果合并，形成可操作的风控结论。</p>
+      <div class="metrics">
+        <div class="metric"><div class="k">方向风险</div><div class="v" id="dirRisk">中</div></div>
+        <div class="metric"><div class="k">凸性风险</div><div class="v" id="gammaRisk">中</div></div>
+        <div class="metric"><div class="k">时间损耗</div><div class="v" id="thetaRisk">中</div></div>
+        <div class="metric"><div class="k">波动率风险</div><div class="v" id="vegaRisk">中</div></div>
+      </div>
+      <div class="note" style="margin-top:1rem" id="riskAdvice">建议：如果净 Delta 偏大、Theta 长期为负且保证金使用率超过 35%，优先减仓或做对冲腿。</div>
+      <p class="status" style="margin-top:1rem">PWA 状态：<span id="pwaStatus">可浏览器直接使用</span></p>
+    </div>
+  </section>
+</main>
+<nav class="bottom-nav" aria-label="底部导航">
+  <button class="tab active" data-target="capital">资金</button>
+  <button class="tab" data-target="pricing">定价</button>
+  <button class="tab" data-target="strategy">策略</button>
+  <button class="tab" data-target="pnl">收益</button>
+  <button class="tab" data-target="risk">风控</button>
+</nav>
+</div>
+<script>
+const $$=(s,e=document)=>Array.from(e.querySelectorAll(s)); const $=(s,e=document)=>e.querySelector(s); const fmt=n=>Number(n||0).toLocaleString('zh-CN',{maximumFractionDigits:2}); const signed=n=>(n>0?'+':'')+fmt(n); let payoffChart;
+$('[data-theme-toggle]').addEventListener('click',()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';$('[data-theme-toggle]').textContent=r.dataset.theme==='dark'?'☼':'☾';});
+$$('.tab').forEach(btn=>btn.addEventListener('click',()=>{$$('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');$$('.section').forEach(sec=>sec.classList.toggle('active',sec.dataset.section===btn.dataset.target));$('#mainContent').scrollTo({top:0,behavior:'smooth'});}));
+function normPdf(x){return Math.exp(-0.5*x*x)/Math.sqrt(2*Math.PI)}
+function normCdf(x){const t=1/(1+0.2316419*Math.abs(x));const d=0.3989423*Math.exp(-x*x/2);let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));p=1-p;return x<0?1-p:p}
+function blackScholes(type,S,K,r,sigma,T){sigma=Math.max(sigma,0.0001);T=Math.max(T,1/365);const d1=(Math.log(S/K)+(r+0.5*sigma*sigma)*T)/(sigma*Math.sqrt(T));const d2=d1-sigma*Math.sqrt(T);const nd1=normCdf(d1), nd2=normCdf(d2), pdf=normPdf(d1);const call=S*nd1-K*Math.exp(-r*T)*nd2;const put=K*Math.exp(-r*T)*normCdf(-d2)-S*normCdf(-d1);const delta=type==='call'?nd1:nd1-1;const gamma=pdf/(S*sigma*Math.sqrt(T));const vega=S*pdf*Math.sqrt(T)/100;const thetaCall=(-S*pdf*sigma/(2*Math.sqrt(T)) - r*K*Math.exp(-r*T)*nd2)/365; const thetaPut=(-S*pdf*sigma/(2*Math.sqrt(T)) + r*K*Math.exp(-r*T)*normCdf(-d2))/365; return {price:type==='call'?call:put,delta,gamma,theta:type==='call'?thetaCall:thetaPut,vega};}
+function calcCapital(){const equity=+$('#equity').value,riskPct=+$('#riskPct').value/100,pointValue=+$('#pointValue').value,stopPts=+$('#stopPts').value,marginRate=+$('#marginRate').value/100,spot=+$('#spotCapital').value;const riskBudget=equity*riskPct;const riskPerContract=pointValue*stopPts;const contracts=Math.max(0,Math.floor(riskBudget/Math.max(riskPerContract,1)));const marginEstimate=contracts*spot*pointValue*marginRate/10;const usage=equity?(marginEstimate/equity)*100:0;$('#riskBudget').textContent=fmt(riskBudget);$('#contractQty').textContent=fmt(contracts);$('#marginEstimate').textContent=fmt(marginEstimate);$('#capitalUsage').textContent=fmt(usage)+'%';$('#marginUsed').textContent=fmt(marginEstimate);return {usage,contracts,marginEstimate};}
+function calcBS(write=true){const type=$('#bsType').value, side=+$('#bsSide').value, S=+$('#bsS').value, K=+$('#bsK').value, sigma=+$('#bsVol').value/100, r=+$('#bsR').value/100, T=+$('#bsDays').value/365, qty=+$('#bsQty').value, mult=+$('#bsMult').value;const bs=blackScholes(type,S,K,r,sigma,T);$('#bsPrice').textContent=fmt(bs.price);$('#bsDelta').textContent=signed(bs.delta);$('#bsGamma').textContent=signed(bs.gamma);$('#bsTheta').textContent=signed(bs.theta);$('#bsVega').textContent=signed(bs.vega);$('#bsPremium').textContent=fmt(bs.price*qty*mult);if(write){const row=$$('#greekBody tr')[type==='call'?1:2];$('.legDir',row).value=String(side);$('.legQty',row).value=qty;$('.legDelta',row).value=bs.delta.toFixed(4);$('.legGamma',row).value=bs.gamma.toFixed(4);$('.legTheta',row).value=bs.theta.toFixed(4);$('.legVega',row).value=bs.vega.toFixed(4);const line=`${K}, ${bs.price.toFixed(2)}, ${side*qty}`;if(type==='call')$('#callLine').value=line;else $('#putLine').value=line;}return {...bs,side,qty,mult,type};}
+function calcGreeks(){let d=0,g=0,t=0,v=0;$$('#greekBody tr').forEach(row=>{const dir=+$('.legDir',row).value,qty=+$('.legQty',row).value,delta=+$('.legDelta',row).value,gamma=+$('.legGamma',row).value,theta=+$('.legTheta',row).value,vega=+$('.legVega',row).value;d+=dir*qty*delta;g+=dir*qty*gamma;t+=dir*qty*theta;v+=dir*qty*vega;});$('#netDelta').textContent=signed(d);$('#netGamma').textContent=signed(g);$('#netTheta').textContent=signed(t);$('#netVega').textContent=signed(v);$('#dirRisk').textContent=Math.abs(d)>1.3?'高':Math.abs(d)>0.6?'中':'低';$('#gammaRisk').textContent=Math.abs(g)>0.03?'高':Math.abs(g)>0.012?'中':'低';$('#thetaRisk').textContent=t<-12?'高':t<-4?'中':'低';$('#vegaRisk').textContent=Math.abs(v)>35?'高':Math.abs(v)>15?'中':'低';return {d,g,t,v};}
+function parseLine(str){const [strike,premium,qty]=String(str).split(',').map(s=>+s.trim());return{strike:strike||0,premium:premium||0,qty:qty||0}}
+function optionPayoff(type,price,strike,premium,qty,mult){const intrinsic=type==='call'?Math.max(price-strike,0):Math.max(strike-price,0);return((intrinsic-premium)*qty)*mult}
+function calcPnL(){const spot=+$('#spot').value,step=+$('#priceStep').value,futuresQty=+$('#futuresQty').value,futuresEntry=+$('#futuresEntry').value,mult=+$('#multiplier').value,call=parseLine($('#callLine').value),put=parseLine($('#putLine').value);const prices=[],pnls=[];for(let p=spot*0.75;p<=spot*1.25;p+=step){const futuresPnl=(p-futuresEntry)*futuresQty*mult;const callPnl=optionPayoff('call',p,call.strike,call.premium,call.qty,mult);const putPnl=optionPayoff('put',p,put.strike,put.premium,put.qty,mult);prices.push(Number(p.toFixed(2)));pnls.push(Number((futuresPnl+callPnl+putPnl).toFixed(2)));}const maxProfit=Math.max(...pnls),maxLoss=Math.min(...pnls),stressLoss=[...pnls].sort((a,b)=>a-b)[Math.floor(pnls.length*0.05)]||0;const bes=[];for(let i=1;i<pnls.length;i++){if((pnls[i-1]<=0&&pnls[i]>=0)||(pnls[i-1]>=0&&pnls[i]<=0))bes.push(prices[i])}$('#maxProfit').textContent=fmt(maxProfit);$('#maxLoss').textContent=fmt(maxLoss);$('#breakeven').textContent=bes.length?bes.join(' / '):'无';$('#stressLoss').textContent=fmt(stressLoss);if(payoffChart)payoffChart.destroy();payoffChart=new Chart($('#payoffChart'),{type:'line',data:{labels:prices,datasets:[{label:'组合盈亏',data:pnls,borderColor:'#4f98a3',backgroundColor:'rgba(79,152,163,.15)',fill:true,tension:.22,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,resizeDelay:120,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#9da39d',maxTicksLimit:6}},y:{ticks:{color:'#9da39d',maxTicksLimit:6}}}}});return {maxProfit,maxLoss,stressLoss,bes};}
+function setGreekRow(i,dir,qty,delta,gamma,theta,vega){const row=$$('#greekBody tr')[i];$('.legDir',row).value=dir;$('.legQty',row).value=qty;$('.legDelta',row).value=delta;$('.legGamma',row).value=gamma;$('.legTheta',row).value=theta;$('.legVega',row).value=vega;}
+function syncTemplate(name){const cfg={coveredCall:{futuresQty:1,call:'3350, 48, -1',put:'3180, 0, 0'},protectivePut:{futuresQty:1,call:'3400, 0, 0',put:'3180, 40, 1'},bullCallSpread:{futuresQty:0,call:'3200, 85, 1',put:'3400, 45, -1'},bearPutSpread:{futuresQty:0,call:'3400, 0, 0',put:'3300, 78, 1'},longStraddle:{futuresQty:0,call:'3250, 70, 1',put:'3250, 65, 1'},shortStrangle:{futuresQty:0,call:'3350, 35, -1',put:'3150, 30, -1'}}[name];if(!cfg)return;$('#futuresQty').value=cfg.futuresQty;$('#callLine').value=cfg.call;$('#putLine').value=cfg.put;if(name==='coveredCall'){setGreekRow(0,'1',1,1,0,0,0);setGreekRow(1,'-1',1,0.35,0.012,-9,24);setGreekRow(2,'1',0,0,0,0,0);}if(name==='protectivePut'){setGreekRow(0,'1',1,1,0,0,0);setGreekRow(1,'1',0,0,0,0,0);setGreekRow(2,'1',1,-0.32,0.014,-7,19);}if(name==='bullCallSpread'){setGreekRow(0,'1',0,0,0,0,0);setGreekRow(1,'1',1,0.54,0.019,-13,28);setGreekRow(2,'-1',1,0.21,0.008,-5,13);}if(name==='bearPutSpread'){setGreekRow(0,'1',0,0,0,0,0);setGreekRow(1,'1',0,0,0,0,0);setGreekRow(2,'1',1,-0.56,0.018,-10,24);}if(name==='longStraddle'){setGreekRow(0,'1',0,0,0,0,0);setGreekRow(1,'1',1,0.5,0.022,-15,30);setGreekRow(2,'1',1,-0.5,0.022,-15,30);}if(name==='shortStrangle'){setGreekRow(0,'1',0,0,0,0,0);setGreekRow(1,'-1',1,0.24,0.010,-6,14);setGreekRow(2,'-1',1,-0.19,0.009,-5,12);}updateAll();}
+$$('.tmpl').forEach(b=>b.addEventListener('click',()=>syncTemplate(b.dataset.template)));
+function updateAdvice(cap,gr,pnl){const score=[cap.usage>35,Math.abs(gr.d)>1.3,gr.t<-12,Math.abs(gr.v)>35,pnl.maxLoss<-50000].filter(Boolean).length;$('#riskLevel').textContent=score>=4?'高':score>=2?'中':'低';const tips=[];if(cap.usage>35)tips.push('保证金利用率偏高');if(Math.abs(gr.d)>1.3)tips.push('方向暴露过大');if(gr.t<-12)tips.push('Theta 衰减较快');if(Math.abs(gr.v)>35)tips.push('波动率暴露显著');if(pnl.maxLoss<-50000)tips.push('极端情景损失偏大');$('#riskAdvice').textContent='建议：'+(tips.length?tips.join('；')+'，优先减仓、对冲或滚动调整。':'当前组合风险可控，可继续跟踪波动率与保证金变化。');}
+function updateAll(){const cap=calcCapital();calcBS(false);const gr=calcGreeks();const pnl=calcPnL();updateAdvice(cap,gr,pnl)}
+$('#calcCapital').addEventListener('click',updateAll);$('#calcBS').addEventListener('click',()=>{calcBS(true);updateAll()});$('#calcGreeks').addEventListener('click',updateAll);$('#calcPnL').addEventListener('click',updateAll);updateAll();
+if('serviceWorker' in navigator){window.addEventListener('load',async()=>{try{await navigator.serviceWorker.register('./sw.js');$('#pwaStatus').textContent='已启用离线缓存与安装支持';}catch(e){$('#pwaStatus').textContent='浏览器可用，离线缓存未启用';}})}
+</script>
+</body>
+</html>

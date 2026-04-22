@@ -1,18 +1,41 @@
 {
+  "id": "/futures-options-app/",
   "name": "期货期权风控 Pro",
   "short_name": "风控Pro",
-  "start_url": "./futures-options-risk-pro.html",
+  "description": "安卓端期货与期权组合策略资金管理、Black-Scholes 定价、Greeks 管理、收益风险测算工具",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
   "background_color": "#171614",
   "theme_color": "#171614",
-  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23171614'/%3E%3Cpath d='M12 42 26 28l9 9 17-23' fill='none' stroke='%234f98a3' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12 52h40' fill='none' stroke='%23ece9e3' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
